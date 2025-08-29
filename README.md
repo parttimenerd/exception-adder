@@ -1,6 +1,8 @@
 Exception Adder
 ===============
 
+[![Build JAR](https://github.com/parttimenerd/exploder-agent/actions/workflows/build.yml/badge.svg)](https://github.com/parttimenerd/exploder-agent/actions/workflows/build.yml)
+
 This agent adds `throw new SomeException()` at random places in your application (or agent).
 This is useful to test the resilience of your application (or agent) against unexpected exceptions.
 It is primarily meant to test that a failing agent doesn't affect the application.
