@@ -5,6 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+    workflow_dispatch:
 
 jobs:
   build:
@@ -23,8 +24,17 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: (!cancelled())
+        with:
+          files: |
+            test-results/**/*.xml
+            test-results/**/*.trx
+            test-results/**/*.json
+
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:
-          name: exploder-agent-jar
+          name: exception-adder-jar
           path: target/*.jar

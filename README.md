@@ -1,47 +1,79 @@
-Exception Adder
-===============
+ExceptionAdder
+==============
 
-[![Build JAR](https://github.com/parttimenerd/exploder-agent/actions/workflows/build.yml/badge.svg)](https://github.com/parttimenerd/exploder-agent/actions/workflows/build.yml)
+[![Build](https://github.com/parttimenerd/exception-adder/actions/workflows/build.yml/badge.svg)](https://github.com/parttimenerd/exception-adder/actions/workflows/build.yml)
+![Maven Central Version](https://img.shields.io/maven-central/v/me.bechberger/exception-adder)
 
-This agent adds `throw new SomeException()` at random places in your application (or agent).
+
+A tiny library that adds `throw new SomeException()` at random places in your application (or agent).
 This is useful to test the resilience of your application (or agent) against unexpected exceptions.
-It is primarily meant to test that a failing agent doesn't affect the application.
+It is primarily meant to test that a failing agent doesn't affect the application
+and that an agent itself is resilient against exceptions and can recover from them.
 
-__This project is just a rough prototype so use at your own risk.__
+Installation
+------------
+
+It requires Java 17 or later. With Maven, just add the dependency:
+
+```xml
+<dependency>
+    <groupId>me.bechberger</groupId>
+    <artifactId>exception-adder</artifactId>
+    <version>0.0.1</version>
+</dependency>
+```
+
+And allow the use [bytebuddy](https://bytebuddy.net) agent to be attached:
+
+```xml
+<plugin>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>3.5.3</version>
+    <configuration>
+        <argLine>-XX:+EnableDynamicAgentLoading -Djdk.attach.allowAttachSelf=true</argLine>
+    </configuration>
+</plugin>
+```
+
+Usage
+-----
+
+Now you can use the agent in your tests like this:
+
+```java
+import me.bechberger.exploder.ExceptionAdder;
+
+@Test
+public void testWith() throws Exception {
+    ExceptionAdder.with(new ExploderArgs()
+                    .glob("me.bechberger.test.ExplodeTestClass")
+                    .classProbability(1.0)
+                    .methodProbability(1.0)
+                    .exception("java.lang.RuntimeException")
+            , () -> {
+                assertThrows(RuntimeException.class, () -> {
+                    ExplodeTestClass testClass = new ExplodeTestClass();
+                    testClass.executeAll();
+                });
+            });
+}
+```
 
 Build
 -----
+
 ```sh
 git clone https://github.com/parttimenerd/exception-adder
 cd exception-adder
 mvn package
 ```
 
-Usage
------
-Attach the agent either later or at the beginning:
+Test
+----
+There are minimal unit tests included. Run them with:
+
 ```sh
-java -javaagent:target/exploder-agent.jar=classProb=1,methodProb=0.5 Sample.java
-```
-
-This will replace methods with `throw new RuntimeException()` with a probability of 50%.
-
-Help:
-```sh
-> java -javaagent:target/exploder-agent.jar=help
-Usage:
-  -javaagent:exploder-agent.jar="glob=<pattern>,classProb=<0-1>,methodProb=<0-1>,exception=<ex>"
-
-Arguments:
-  glob       Glob pattern for class names (default=**)
-  classProb  Probability [0-1] to modify a class (default=0.5)
-  methodProb Probability [0-1] to modify a method (default=0.5)
-  exception  Exception class to throw (default=java.lang.RuntimeException)
-  verbose    If set, prints detailed info about each method decision (default=false)
-
-Commands:
-  help   Print this help and exit
-  reset  Reset previous transformations and exit
+mvn test
 ```
 
 License

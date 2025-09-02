@@ -17,13 +17,11 @@ public class ProbabilisticImplementation implements Implementation {
     private final SecureRandom random;
     private final double probability;
     private final Class<? extends Throwable> exceptionClass;
-    private final boolean verbose;
 
-    ProbabilisticImplementation(SecureRandom random, double probability, Class<? extends Throwable> exceptionClass, boolean verbose) {
+    ProbabilisticImplementation(SecureRandom random, double probability, Class<? extends Throwable> exceptionClass) {
         this.random = random;
         this.probability = probability;
         this.exceptionClass = exceptionClass;
-        this.verbose = verbose;
     }
 
     @Override
@@ -31,9 +29,6 @@ public class ProbabilisticImplementation implements Implementation {
         return (MethodVisitor mv, Context ctx, MethodDescription method) -> {
             boolean shouldExplode = random.nextDouble() <= probability;
             if (shouldExplode) {
-                if (verbose) {
-                    System.out.println("  -> Exploding method: " + method);
-                }
                 return ExceptionMethod.throwing(exceptionClass).appender(implementationTarget).apply(mv, ctx, method);
             } else {
                 // Use SuperCall to preserve original method behavior

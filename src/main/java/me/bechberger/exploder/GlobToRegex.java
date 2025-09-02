@@ -1,5 +1,8 @@
 package me.bechberger.exploder;
 
+/**
+ * Utility class to convert glob patterns to regex patterns
+ */
 public class GlobToRegex {
     static String toRegex(String glob) {
         StringBuilder sb = new StringBuilder();
