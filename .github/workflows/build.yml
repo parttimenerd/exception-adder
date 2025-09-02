@@ -7,6 +7,10 @@ on:
     branches: [ main ]
     workflow_dispatch:
 
+permissions:
+  checks: write
+  pull-requests: write # only required if `comment: true` was enabled
+
 jobs:
   build:
     runs-on: ubuntu-latest
