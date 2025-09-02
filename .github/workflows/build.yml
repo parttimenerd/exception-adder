@@ -1,4 +1,4 @@
-name: Build JAR
+name: Build and Test
 
 on:
   push:
@@ -29,9 +29,7 @@ jobs:
         if: (!cancelled())
         with:
           files: |
-            test-results/**/*.xml
-            test-results/**/*.trx
-            test-results/**/*.json
+            target/surefire-reports/**/*.xml
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
